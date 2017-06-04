@@ -24,12 +24,6 @@ class StockChecker:
         ch.setFormatter(formatter)
         self._logger.addHandler(ch)
 
-        # LOGFILE
-        ch = RotatingFileHandler('/var/log/stock_check/check.log', maxBytes=5000000, backupCount=1)
-        ch.setLevel(level)
-        ch.setFormatter(formatter)
-        self._logger.addHandler(ch)
-
     def __get_items(self, url):
         page = requests.get(url)
         soup = BeautifulSoup(page.content, 'html.parser')
