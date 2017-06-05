@@ -1,14 +1,14 @@
 import os
 import logging
-from logging.handlers import RotatingFileHandler
 import requests
 from bs4 import BeautifulSoup
 
 from twilio_messenger import TwilioMessenger
+from db import PostDB
 
 # urls
 item_urls = [
-    'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&DEPA=0&Order=BESTMATCH&Description=rx+580&N=100007709%20600494828&isNodeId=1', # 8G RX 580
+    'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&DEPA=0&Order=BESTMATCH&Description=rx+580&N=100007709%20600494828%20600007787&isNodeId=1', # 4G/8G RX 580
     'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&N=100007709%20600007787&IsNodeId=1&Description=rx%20570&name=Desktop%20Graphics%20Cards&Order=BESTMATCH&isdeptsrh=1' # 4G RX 570
 ]
 
@@ -73,10 +73,25 @@ class StockChecker:
         return in_stock_urls
 
 if __name__ == '__main__':
+    db = PostDB(os.environ["DATABASE_URL"])
+    db.delete_expired_links()
+
     stock = StockChecker()
     stock_list = stock.check_stock(item_urls)
     if len(stock_list) > 0:
+        # filter out links we've already been notified about
+        links_in_db = db.get_all_links()
+        print(links_in_db)
+        for link in stock_list:
+            print(link)
+            if link in links_in_db:
+                stock_list.remove(link)
+
+        print(stock_list)
         links = '\n'.join(stock_list)
         tm = TwilioMessenger()
         message = tm.send_message(my_number, twilio_number, links)
-        print(message)
+        print(message.status)
+
+        for link in stock_list:
+            db.add_link(link)
