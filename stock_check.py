@@ -1,13 +1,19 @@
+import os
 import logging
 from logging.handlers import RotatingFileHandler
 import requests
 from bs4 import BeautifulSoup
 
+from twilio_messenger import TwilioMessenger
+
 # urls
 item_urls = [
-    'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&N=100007709&IsNodeId=1&Description=rx%20580&name=Desktop%20Graphics%20Cards&Order=BESTMATCH&isdeptsrh=1',
-    'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&N=100007709&IsNodeId=1&Description=rx%20570&name=Desktop%20Graphics%20Cards&Order=BESTMATCH&isdeptsrh=1'
+    'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&DEPA=0&Order=BESTMATCH&Description=rx+580&N=100007709%20600494828&isNodeId=1', # 8G RX 580
+    'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&N=100007709%20600007787&IsNodeId=1&Description=rx%20570&name=Desktop%20Graphics%20Cards&Order=BESTMATCH&isdeptsrh=1' # 4G RX 570
 ]
+
+my_number = os.environ['MY_NUMBER']
+twilio_number = os.environ['TWILIO_NUMBER']
 
 class StockChecker:
     def __init__(self):
@@ -70,4 +76,7 @@ if __name__ == '__main__':
     stock = StockChecker()
     stock_list = stock.check_stock(item_urls)
     if len(stock_list) > 0:
-        print('\n'.join(stock_list))
+        links = '\n'.join(stock_list)
+        tm = TwilioMessenger()
+        message = tm.send_message(my_number, twilio_number, links)
+        print(message)
