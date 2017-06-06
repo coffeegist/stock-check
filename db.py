@@ -45,6 +45,7 @@ class PostDB(object):
         links = cur.fetchall()
         self._conn.commit()
         cur.close()
+        self._logger.info('Finished retrieving links!')
 
         return [i[0] for i in links] # convert from list of tuples to list
 

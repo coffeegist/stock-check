@@ -72,26 +72,27 @@ class StockChecker:
 
         return in_stock_urls
 
+def remove_duplicate_links(db, stock_list):
+    result = []
+    links_in_db = db.get_all_links()
+    for link in stock_list:
+        if link not in links_in_db:
+            result.append(link)
+
+    return result
+
 if __name__ == '__main__':
     db = PostDB(os.environ["DATABASE_URL"])
     db.delete_expired_links()
 
     stock = StockChecker()
     stock_list = stock.check_stock(item_urls)
+    stock_list = remove_duplicate_links(db, stock_list)
     if len(stock_list) > 0:
-        # filter out links we've already been notified about
-        links_in_db = db.get_all_links()
-        print(links_in_db)
-        for link in stock_list:
-            print(link)
-            if link in links_in_db:
-                stock_list.remove(link)
-
-        print(stock_list)
         links = '\n'.join(stock_list)
         tm = TwilioMessenger()
         message = tm.send_message(my_number, twilio_number, links)
-        print(message.status)
-
-        for link in stock_list:
-            db.add_link(link)
+        if message.status == 'queued':
+            # Successfully queued to send. Add links to db
+            for link in stock_list:
+                db.add_link(link)
