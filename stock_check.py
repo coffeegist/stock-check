@@ -43,7 +43,7 @@ class StockChecker:
         return in_stock
 
     def check_stock(self, urls): # get all items
-        self._logger.info('Beginning stock check...')
+        self._logger.info('Checking stock...\n')
         in_stock_urls = []
 
         for url in urls:
@@ -72,6 +72,18 @@ class StockChecker:
 
         return in_stock_urls
 
+def setup_logging(level, format_string):
+    logger = logging.getLogger(__name__)
+    logger.setLevel(level)
+    formatter = logging.Formatter(format_string)
+
+    # STDOUT
+    ch = logging.StreamHandler()
+    ch.setLevel(level)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    return logger
+
 def remove_duplicate_links(db, stock_list):
     result = []
     links_in_db = db.get_all_links()
@@ -82,6 +94,9 @@ def remove_duplicate_links(db, stock_list):
     return result
 
 if __name__ == '__main__':
+    logger = setup_logging(logging.INFO, '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logger.info('Launching stock check...\n')
+
     db = PostDB(os.environ["DATABASE_URL"])
     db.delete_expired_links()
 
@@ -96,3 +111,8 @@ if __name__ == '__main__':
             # Successfully queued to send. Add links to db
             for link in stock_list:
                 db.add_link(link)
+
+            logger.info('Text message queued to send!\n')
+
+    logger.info('{} new items detected.'.format(len(stock_list)))
+    logger.info('Stock checker finished!')

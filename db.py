@@ -36,7 +36,7 @@ class PostDB(object):
         self._conn.commit()
         cur.close()
 
-        self._logger.info('Finished adding link!')
+        self._logger.info('Finished adding link to db!')
 
     def get_all_links(self):
         self._logger.info('Retrieving links...')
@@ -45,7 +45,7 @@ class PostDB(object):
         links = cur.fetchall()
         self._conn.commit()
         cur.close()
-        self._logger.info('Finished retrieving links!')
+        self._logger.info('{} links found in db!\n'.format(len(links)))
 
         return [i[0] for i in links] # convert from list of tuples to list
 
@@ -60,7 +60,7 @@ class PostDB(object):
         for row in deleted_rows:
             self._logger.info('{} expired at {} and has been removed.'.format(row[1], row[2]))
 
-        self._logger.info('Finished deleting expired links!')
+        self._logger.info('Finished deleting expired links from db!\n')
 
 if __name__ == "__main__":
     db = PostDB(os.environ["DATABASE_URL"])
