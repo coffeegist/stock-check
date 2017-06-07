@@ -19,6 +19,7 @@ class PostDB(object):
 
     def __setup_logging(self, level, format_string):
         self._logger = logging.getLogger(self.__class__.__name__)
+        self._logger.handlers = []
         self._logger.setLevel(level)
         formatter = logging.Formatter(format_string)
 

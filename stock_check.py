@@ -25,6 +25,7 @@ class StockChecker:
 
     def __setup_logging(self, level, format_string):
         self._logger = logging.getLogger(self.__class__.__name__)
+        self._logger.handlers = []
         self._logger.setLevel(level)
         formatter = logging.Formatter(format_string)
 
@@ -78,6 +79,7 @@ class StockChecker:
 
 def setup_logging(level, format_string):
     logger = logging.getLogger(__name__)
+    logger.handlers = []
     logger.setLevel(level)
     formatter = logging.Formatter(format_string)
 
@@ -97,7 +99,7 @@ def remove_duplicate_links(db, stock_list, number):
 
     return result
 
-if __name__ == '__main__':
+def run():
     logger = setup_logging(logging.INFO, '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logger.info('Launching stock check...\n')
 
@@ -127,3 +129,6 @@ if __name__ == '__main__':
 
     logger.info('{} new items detected.'.format(len(stock_list)))
     logger.info('Stock checker finished!')
+
+if __name__ == '__main__':
+    run()
