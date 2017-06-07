@@ -29,10 +29,10 @@ class PostDB(object):
         self._logger.addHandler(ch)
 
 
-    def add_link(self, link):
-        self._logger.info('Adding link {}...'.format(link))
+    def add_link(self, link, number):
+        self._logger.info('Adding link {} with number {}...'.format(link, number))
         cur = self._conn.cursor()
-        cur.execute("INSERT INTO links (link) VALUES (%s)", [link])
+        cur.execute("INSERT INTO links (link,sms) VALUES (%s,%s)", [link, number])
         self._conn.commit()
         cur.close()
 
@@ -41,13 +41,13 @@ class PostDB(object):
     def get_all_links(self):
         self._logger.info('Retrieving links...')
         cur = self._conn.cursor()
-        cur.execute("SELECT link FROM links")
+        cur.execute("SELECT link, sms FROM links")
         links = cur.fetchall()
         self._conn.commit()
         cur.close()
         self._logger.info('{} links found in db!\n'.format(len(links)))
 
-        return [i[0] for i in links] # convert from list of tuples to list
+        return links
 
     def delete_expired_links(self):
         self._logger.info('Deleting expired links...')

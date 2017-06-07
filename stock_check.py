@@ -6,13 +6,17 @@ from bs4 import BeautifulSoup
 from twilio_messenger import TwilioMessenger
 from db import PostDB
 
+LINK_COL = 0 # link
+SMS_COL = 1 # phone number link was sms'ed to
+LINKS_PER_MESSAGE = 10 # send up to 10 links at a time
+
 # urls
 item_urls = [
     'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&DEPA=0&Order=BESTMATCH&Description=rx+580&N=100007709%20600494828%20600007787&isNodeId=1', # 4G/8G RX 580
     'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&N=100007709%20600007787&IsNodeId=1&Description=rx%20570&name=Desktop%20Graphics%20Cards&Order=BESTMATCH&isdeptsrh=1' # 4G RX 570
 ]
 
-my_number = os.environ['MY_NUMBER']
+my_numbers = os.environ['MY_NUMBER'].split(',')
 twilio_number = os.environ['TWILIO_NUMBER']
 
 class StockChecker:
@@ -84,11 +88,11 @@ def setup_logging(level, format_string):
     logger.addHandler(ch)
     return logger
 
-def remove_duplicate_links(db, stock_list):
+def remove_duplicate_links(db, stock_list, number):
     result = []
     links_in_db = db.get_all_links()
     for link in stock_list:
-        if link not in links_in_db:
+        if (link, number) not in links_in_db:
             result.append(link)
 
     return result
@@ -102,17 +106,24 @@ if __name__ == '__main__':
 
     stock = StockChecker()
     stock_list = stock.check_stock(item_urls)
-    stock_list = remove_duplicate_links(db, stock_list)
     if len(stock_list) > 0:
-        links = '\n'.join(stock_list)
         tm = TwilioMessenger()
-        message = tm.send_message(my_number, twilio_number, links)
-        if message.status == 'queued':
-            # Successfully queued to send. Add links to db
-            for link in stock_list:
-                db.add_link(link)
+        for number in my_numbers:
+            links = '\n'.join(remove_duplicate_links(db, stock_list, number))
 
-            logger.info('Text message queued to send!\n')
+            # 1600 character limit with twilio
+            while len(links) > 0:
+                link_list = links.split('\n')[:LINKS_PER_MESSAGE]
+                msg_body = '\n'.join(link_list)
+                logger.info('Sending following text to {}:\n{}'.format(number, msg_body))
+                message = tm.send_message(number, twilio_number, msg_body)
+                links = '\n'.join(links.split('\n')[LINKS_PER_MESSAGE:])
+
+                if message.status == 'queued':
+                    logger.info('Text message queued to send!\n')
+                    # Successfully queued to send. Add links to db
+                    for link in link_list:
+                        db.add_link(link, number)
 
     logger.info('{} new items detected.'.format(len(stock_list)))
     logger.info('Stock checker finished!')
