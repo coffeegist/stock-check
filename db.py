@@ -61,7 +61,7 @@ class PostDB(object):
         for row in deleted_rows:
             self._logger.info('{} expired at {} and has been removed.'.format(row[1], row[2]))
 
-        self._logger.info('Finished deleting expired links from db!\n')
+        self._logger.info('Finished deleting {} expired links from db!\n'.format(len(deleted_rows)))
 
 if __name__ == "__main__":
     db = PostDB(os.environ["DATABASE_URL"])

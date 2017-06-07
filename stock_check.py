@@ -127,7 +127,6 @@ def run():
                     for link in link_list:
                         db.add_link(link, number)
 
-    logger.info('{} new items detected.'.format(len(link_list)))
     logger.info('Stock checker finished!')
 
 if __name__ == '__main__':
