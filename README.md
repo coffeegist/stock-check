@@ -26,3 +26,8 @@ stock-check$ heroku addons:create heroku-postgresql:hobby-dev
 stock-check$ psql uri_from_heroku
 > CREATE TABLE LINKS(link VARCHAR(500) NOT NULL, sms VARCHAR(12) NOT NULL, expiration TIMESTAMP NOT NULL DEFAULT (now() + interval '1 day'), PRIMARY KEY (link, sms));
 ```
+
+Scale clock process
+```bash
+stock-check$ heroku ps:scale clock=1
+```
