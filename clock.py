@@ -3,7 +3,7 @@ import stock_check
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', seconds=30)
+@sched.scheduled_job('interval', minutes=1)
 def timed_job():
     stock_check.run()
 
