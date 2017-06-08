@@ -4,7 +4,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', minutes=os.environ['CHECK_INTERVAL'])
+@sched.scheduled_job('interval', minutes=int(os.environ['CHECK_INTERVAL']))
 def timed_job():
     stock_check.run()
 
