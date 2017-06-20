@@ -12,8 +12,8 @@ LINKS_PER_MESSAGE = 10 # send up to 10 links at a time
 
 # urls
 item_urls = [
-    'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&DEPA=0&Order=BESTMATCH&Description=rx+580&N=100007709%20600494828%20600007787&isNodeId=1', # 4G/8G RX 580
-    'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&N=100007709%20600007787&IsNodeId=1&Description=rx%20570&name=Desktop%20Graphics%20Cards&Order=BESTMATCH&isdeptsrh=1' # 4G RX 570
+    'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&DEPA=0&Order=BESTMATCH&Description=rx+580&N=100007709%20600494828%20600007787&isNodeId=1&LeftPriceRange=0%20400', # 4G/8G RX 580
+    'https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&N=100007709%20600007787&IsNodeId=1&Description=rx%20570&name=Desktop%20Graphics%20Cards&Order=BESTMATCH&isdeptsrh=1&LeftPriceRange=0%20400' # 4G RX 570
 ]
 
 my_numbers = os.environ['MY_NUMBER'].split(',')
